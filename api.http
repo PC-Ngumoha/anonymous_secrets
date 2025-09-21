@@ -1,0 +1,14 @@
+### Create a secret
+POST http://127.0.0.1:8000/secrets/
+Content-Type: application/json
+
+{
+  "text": "I ate all the lovely cupcakes in the fridge but when Mum asked about them, I told her that Chinonso did it.",
+  "author_name": "Chukwuemeka Ngumoha"
+}
+
+### Get all secrets
+GET http://127.0.0.1:8000/secrets/
+
+### Get a secret
+GET http://127.0.0.1:8000/secrets/1

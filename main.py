@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import FastAPI, Depends, Query
+from fastapi import FastAPI, Depends, Query, HTTPException
 from sqlmodel import SQLModel, Field, Session, create_engine, select
 
 # Define secrets model
@@ -36,5 +36,26 @@ def start_app():
 
 
 @app.get('/secrets/')
-def read_secrets(session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=10)] = 10):
+def read_secrets(
+    session: SessionDep,
+    offset: int = 0,
+    limit: Annotated[int, Query(le=10)] = 10
+) -> list[Secret]:
     secrets = session.exec(select(Secret).offset(offset).limit(limit))
+    return secrets
+
+
+@app.get('/secrets/{secret_id}')
+def read_secret(secret_id: int, session: SessionDep) -> Secret:
+    secret = session.get(Secret, secret_id)
+    if not secret:
+        raise HTTPException(status_code=404, detail="Secret not found")
+    return secret
+
+
+@app.post('/secrets/')
+def add_secret(secret: Secret, session: SessionDep) -> Secret:
+    session.add(secret)
+    session.commit()
+    session.refresh(secret)
+    return secret
